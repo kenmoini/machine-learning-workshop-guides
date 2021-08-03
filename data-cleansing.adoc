@@ -71,53 +71,53 @@ Click on *YAML View*. Replace the YAML in the edit box with the following defini
 apiVersion: kfdef.apps.kubeflow.org/v1
 kind: KfDef
 metadata:
-# The name of your deployment
-name: opendatahub
+  # The name of your deployment
+  name: opendatahub
 # only the components listed in the `KFDef` resource will be deployed:
 spec:
-applications:
- # REQUIRED: This contains all of the common options used by all ODH components
- - kustomizeConfig:
+  applications:
+  # REQUIRED: This contains all of the common options used by all ODH components
+  - kustomizeConfig:
      repoRef:
        name: manifests
        path: odh-common
    name: odh-common
- # Create the SecurityContextConstraint to grant the ceph-nano service account anyuid permissions
- - kustomizeConfig:
+  # Create the SecurityContextConstraint to grant the ceph-nano service account anyuid permissions
+  - kustomizeConfig:
      repoRef:
        name: manifests
        path: ceph/object-storage/scc
    name: ceph-nano-scc
- # Deploy ceph-nano for minimal object storage running in a pod
- - kustomizeConfig:
+  # Deploy ceph-nano for minimal object storage running in a pod
+  - kustomizeConfig:
      repoRef:
        name: manifests
        path: ceph/object-storage/nano
    name: ceph-nano
- # Deploy Open Data Hub Grafana
- - kustomizeConfig:
+  # Deploy Open Data Hub Grafana
+  - kustomizeConfig:
      repoRef:
       name: manifests
       path: grafana/cluster
    name: grafana-cluster
- - kustomizeConfig:
+  - kustomizeConfig:
      repoRef:
       name: manifests
       path: grafana/grafana
    name: grafana-instance
- # Deploy Open Data Hub Prometheus
- - kustomizeConfig:
+  # Deploy Open Data Hub Prometheus
+  - kustomizeConfig:
      repoRef:
        name: manifests
        path: prometheus/cluster
    name: prometheus-cluster
- - kustomizeConfig:
+  - kustomizeConfig:
      repoRef:
        name: manifests
        path: prometheus/operator
    name: prometheus-operator
- # Deploy Open Data Hub JupyterHub
- - kustomizeConfig:
+  # Deploy Open Data Hub JupyterHub
+  - kustomizeConfig:
      parameters:
        - name: s3_endpoint_url
          value: "http://ceph-nano-0"
@@ -125,20 +125,20 @@ applications:
        name: manifests
        path: jupyterhub/jupyterhub
    name: jupyterhub
- # Deploy addtional Open Data Hub Jupyter notebooks
- - kustomizeConfig:
+  # Deploy addtional Open Data Hub Jupyter notebooks
+  - kustomizeConfig:
      overlays:
        - additional
      repoRef:
        name: manifests
        path: jupyterhub/notebook-images
    name: notebook-images
-# Reference to all of the git repo archives that contain component kustomize manifests
-repos:
- # Official Open Data Hub v1.0.0 component manifests repo
- # This shows that we will be deploying components from an archive of the odh-manifests repo tagged for v1.0.0
- - name: manifests
-   uri: 'https://github.com/opendatahub-io/odh-manifests/tarball/v1.0.2'
+  # Reference to all of the git repo archives that contain component kustomize manifests
+  repos:
+  # Official Open Data Hub v1.0.0 component manifests repo
+  # This shows that we will be deploying components from an archive of the odh-manifests repo tagged for v1.0.0
+  - name: manifests
+    uri: 'https://github.com/opendatahub-io/odh-manifests/tarball/v1.0.2'
 ----
 
 image::create-kfdef.png[create-kfdef, 700]
