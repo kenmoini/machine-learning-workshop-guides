@@ -15,7 +15,7 @@ We already have the notebook for training our model downloaded as a part of the 
 
 [source,sh,role="copypaste"]
 ----
-cd ~/machine-learning-workshop-labs/notebooks/ && wget http://saltsmarts.com/hendricks.tar.gz
+cd ~/machine-learning-workshop-labs/notebooks/ && wget http://saltsmarts.com/liquor.tar.gz
 ----
 
 The dataset is large and may take up to five minutes to download.
@@ -24,7 +24,7 @@ To unpack the data, run the following command in the terminal:
 
 [source,sh,role="copypaste"]
 ----
-cd ~/machine-learning-workshop-labs/notebooks/ && tar zfxv hendricks.tar.gz
+cd ~/machine-learning-workshop-labs/notebooks/ && tar zfxv liquor.tar.gz
 ----
 
 You'll see a list of the files in the data set scroll by.
