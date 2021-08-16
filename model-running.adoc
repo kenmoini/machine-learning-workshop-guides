@@ -79,25 +79,25 @@ We'll be using a MariaDB database for this. To deploy the database, click on +Ad
 Replace the following values:
 
 [width=15%]
-|=================================
-|Database Service Name: |xraylabdb
-|Username:              |xraylab
-|Password:              |xraylab
-|Root Password:         |xraylab
-|Database Name:         |xraylabdb
-|=================================
+|===================================
+|Database Service Name: |liquorlabdb
+|Username:              |liquorlab
+|Password:              |liquorlab
+|Root Password:         |liquorlab
+|Database Name:         |liquorlabdb
+|===================================
 
 image::instantiate-mariadb.png[instantiate-mariadb, 700]
 
 Wait for the database to roll out. You should see the circles in the topology turn dark blue.
 
-image::topology-xraylabdb.png[topology-xraylabdb, 700]
+image::topology-liquorlabdb.png[topology-liquorlabdb, 700]
 
 Updating for the mascot of MariaDB, while optional, will gain you the _"Seal of Approval"_. 
 
 [source,sh,role="copypaste"]
 ----
-oc label dc/xraylabdb app.openshift.io/runtime=mariadb
+oc label dc/liquorlabdb app.openshift.io/runtime=mariadb
 ----
 
 === Database configuration
@@ -108,7 +108,7 @@ Connect to the database pod by running the following commands in the Jupyterhub 
 
 [source,sh,role="copypaste"]
 ----
-oc rsh $(oc get pods | grep xraylabdb | grep Running | awk '{print $1}')
+oc rsh $(oc get pods | grep liquorlabdb | grep Running | awk '{print $1}')
 ----
 
 Your Terminal prompt is now the one from the database Pod. It should display:
@@ -126,11 +126,11 @@ mysql -u root
 
 Your Terminal prompt is now the one from the MySQL engine.
 
-Select the xraylabdb database
+Select the liquorlabdb database
 
 [source,sh,role="copypaste"]
 ----
-USE xraylabdb;
+USE liquorlabdb;
 ----
 
 
@@ -192,7 +192,7 @@ Next, we will create Kafka _Topic_. Click _Add > From Catalog_ again, type in `k
 
 image::kafka-topic-catalog.png[kafka, 700]
 
-Click on *Create* and you will enter YAML editor that defines a *KafkaTopic* object. Change the name to `xray-images` as shown then click on *Create* on the bottom.
+Click on *Create* and you will enter YAML editor that defines a *KafkaTopic* object. Change the name to `liquor-images` as shown then click on *Create* on the bottom.
 
 image::create-kafka-topic.png[create-kafka-topic, 700]
 
@@ -246,7 +246,7 @@ image::bucket-list.png[bucket-list, 700]
 
 Next we'll deploy the three services which will do the following steps in the pipeline:
 
-1) Grab an X-Ray image and drop it into the incoming bucket.
+1) Grab a Liquor bottle image and drop it into the incoming bucket.
 2) Analyze the incoming image and tag it.
 3) Display a processed image.
 
@@ -256,7 +256,7 @@ To deploy the Image Generator, we'll be building a container image from source. 
 
 [source,sh,role="copypaste"]
 ----
-cd ~/machine-learning-workshop-labs/services/image-generator && oc new-app https://github.com/msolberg/machine-learning-workshop-labs --context-dir=services/image-generator --name=image-generator --strategy=docker
+cd ~/machine-learning-workshop-labs/services/image-generator && oc new-app https://github.com/msolberg/machine-learning-workshop-labs --context-dir=services/liquor-image-generator --name=liquor-image-generator --strategy=docker
 ----
 
 You should see output similar to the following:
@@ -267,20 +267,20 @@ You should see output similar to the following:
 
     * An image stream tag will be created as "python:3.7" that will track the source image
     * A Docker build using source code from https://github.com/msolberg/machine-learning-workshop-labs/#main will be created
-      * The resulting image will be pushed to image stream tag "image-generator:latest"
+      * The resulting image will be pushed to image stream tag "liquor-image-generator:latest"
       * Every time "python:3.7" changes a new build will be triggered
-    * This image will be deployed in deployment config "image-generator"
+    * This image will be deployed in deployment config "liquor-image-generator"
     * The image does not expose any ports - if you want to load balance or send traffic to this component
-      you will need to create a service with 'expose dc/image-generator --port=[port]' later
+      you will need to create a service with 'expose dc/liquor-image-generator --port=[port]' later
     * WARNING: Image "python:3.7" runs as the 'root' user which may not be permitted by your cluster administrator
 
 --> Creating resources ...
     imagestream.image.openshift.io "python" created
-    imagestream.image.openshift.io "image-generator" created
-    buildconfig.build.openshift.io "image-generator" created
-    deploymentconfig.apps.openshift.io "image-generator" created
+    imagestream.image.openshift.io "liquor-image-generator" created
+    buildconfig.build.openshift.io "liquor-image-generator" created
+    deploymentconfig.apps.openshift.io "liquor-image-generator" created
 --> Success
-    Build scheduled, use 'oc logs -f bc/image-generator' to track its progress.
+    Build scheduled, use 'oc logs -f bc/liquor-image-generator' to track its progress.
     Run 'oc status' to view your app.
 ----
 
@@ -288,14 +288,14 @@ You can follow the progress of the build, which is part of the deployment proces
 
 [source,sh,role="copypaste"]
 ----
-oc logs -f bc/image-generator
+oc logs -f bc/liquor-image-generator
 ----
 
 You should see the Docker build running in the container. Once the build completes, switch over to the topology view to see the container deployment.
 
 image::image-generator-failed.png[image-generator-failed, 700]
 
-The icon for the image-generator deployment will cycle from blue to yellow to red, indicating that the deployment has failed. To determine the cause of the failure, click on the deployment icon, and click "view logs" next to the crashlooping pod.
+The icon for the liquor-image-generator deployment will cycle from blue to yellow to red, indicating that the deployment has failed. To determine the cause of the failure, click on the deployment icon, and click "view logs" next to the crashlooping pod.
 
 image::image-generator-failed-dc.png[image-generator-failed-dc, 700]
 
