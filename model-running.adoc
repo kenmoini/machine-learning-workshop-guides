@@ -87,7 +87,7 @@ Replace the following values:
 |Database Name:         |liquorlabdb
 |===================================
 
-image::instantiate-mariadb.png[instantiate-mariadb, 700]
+image::liquorlab-instantiate-mariadb.png[liquorlab-instantiate-mariadb, 700]
 
 Wait for the database to roll out. You should see the circles in the topology turn dark blue.
 
@@ -194,7 +194,7 @@ image::kafka-topic-catalog.png[kafka, 700]
 
 Click on *Create* and you will enter YAML editor that defines a *KafkaTopic* object. Change the name to `liquor-images` as shown then click on *Create* on the bottom.
 
-image::create-kafka-topic.png[create-kafka-topic, 700]
+image::liquorlab-create-kafka-topic.png[liquorlab-create-kafka-topic, 700]
 
 The Kafka topic will not display on the OpenShift topology.
 
@@ -256,7 +256,7 @@ To deploy the Image Generator, we'll be building a container image from source. 
 
 [source,sh,role="copypaste"]
 ----
-cd ~/machine-learning-workshop-labs/services/image-generator && oc new-app https://github.com/msolberg/machine-learning-workshop-labs --context-dir=services/liquor-image-generator --name=liquor-image-generator --strategy=docker
+cd ~/machine-learning-workshop-labs/services/liquor-image-generator && oc new-app https://github.com/kenmoini/machine-learning-workshop-labs --context-dir=services/liquor-image-generator --name=liquor-image-generator --strategy=docker
 ----
 
 You should see output similar to the following:
@@ -324,7 +324,7 @@ Finally, to deploy the Image Server, we'll be building another container image f
 
 [source,sh,role="copypaste"]
 ----
-cd ~/machine-learning-workshop-labs/services/image-server && oc new-app . --strategy=docker --name=image-server
+cd ~/machine-learning-workshop-labs/services/liquor-image-server && oc new-app . --strategy=docker --name=liquor-image-server
 ----
 
 You should see output similar to the previous example.
@@ -333,21 +333,21 @@ Then, start a build from the local directory with the following command:
 
 [source,sh,role="copypaste"]
 ----
-oc start-build image-server --from-dir=.
+oc start-build liquor-image-server --from-dir=.
 ----
 
 You can follow the progress of the build with the following command:
 
 [source,sh,role="copypaste"]
 ----
-oc logs -f bc/image-server
+oc logs -f bc/liquor-image-server
 ----
 
 We'll want to add a route to the image server so that we can view the images as they are processed. To add a route to the image server, run the following command:
 
 [source,sh,role="copypaste"]
 ----
-oc expose svc/image-server
+oc expose svc/liquor-image-server
 ----
 
 You will see the route that gets created by running the following command:
@@ -363,7 +363,7 @@ You should see output similar to the following:
 ----
 NAME                HOST/PORT                                                                          PATH      SERVICES            PORT       TERMINATION     WILDCARD
 grafana-route       grafana-route-user3-notebooks.apps.cluster-b913.b913.sandbox1073.opentlc.com                 grafana-service       3000       edge            None
-image-server        image-server-user3-notebooks.apps.cluster-b913.b913.sandbox1073.opentlc.com                  image-server          5000-tcp                   None
+liquor-image-server image-server-user3-notebooks.apps.cluster-b913.b913.sandbox1073.opentlc.com                  liquor-image-server   5000-tcp                   None
 jupyterhub          jupyterhub-user3-notebooks.apps.cluster-b913.b913.sandbox1073.opentlc.com                    jupyterhub            8080-tcp   edge/Redirect   None
 prometheus-portal   prometheus-portal-user3-notebooks.apps.cluster-b913.b913.sandbox1073.opentlc.com             prometheus-operated   web                        None
 ----
@@ -379,21 +379,21 @@ The Risk Assessment Service runs as a KNative Serverless Application. We'll depl
 
 [source,sh,role="copypaste"]
 ----
-cd ~/machine-learning-workshop-labs/services/risk-assessment && oc new-build . --name=risk-assessment --strategy=docker
+cd ~/machine-learning-workshop-labs/services/liquor-classifier && oc new-build . --name=liquor-classifier --strategy=docker
 ----
 
 Then, start a build from the local directory with the following command:
 
 [source,sh,role="copypaste"]
 ----
-oc start-build risk-assessment --from-dir=.
+oc start-build liquor-classifier --from-dir=.
 ----
 
 You can follow the progress of the build with the following command:
 
 [source,sh,role="copypaste"]
 ----
-oc logs -f bc/risk-assessment
+oc logs -f bc/liquor-classifier
 ----
 
 You should see the Docker build running in the container. Once the build completes, we'll define a KNative Service to run the container.
@@ -409,7 +409,7 @@ Copy the following `Service` in `YAML` editor then click on *Create*:
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: risk-assessment
+  name: liquor-classifier
 spec:
   template:
     metadata:
@@ -420,9 +420,9 @@ spec:
     spec:
       timeoutSeconds: 30
       containers:
-      - image: 'image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-notebooks/risk-assessment:latest'
+      - image: 'image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-notebooks/liquor-classifier:latest'
         ports:
-              - containerPort: 5000
+        - containerPort: 5000
         env:
         - name: model_version
           value: 'v1'
@@ -462,22 +462,22 @@ Copy the following `KafkaSource` in `YAML` editor then click on *Create*:
 apiVersion: sources.knative.dev/v1beta1
 kind: KafkaSource
 metadata:
-  name: xray-images
+  name: liquor-images
 spec:
   consumerGroup: risk-assessment
   bootstrapServers:
     - my-cluster-kafka-bootstrap:9092
   topics:
-    - xray-images
+    - liquor-images
   sink:
     ref:
       apiVersion: serving.knative.dev/v1
       kind: Service
-      name: risk-assessment
+      name: liquor-classifier
 
 ----
 
-You can see a new connection between Kafka and our *risk-assessment* service.
+You can see a new connection between Kafka and our *liquor-classifier* service.
 
 image::knative-risk-assessment.png[knative-risk-assessment, 700]
 
