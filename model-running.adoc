@@ -373,9 +373,9 @@ You should see the Docker build running in the container. Once the build complet
 The Image Server also needs credentials to view the S3 bucket. Follow the same steps as above to add the secret to the deployment configuration.
 
 
-=== Deploy the Risk Assessment Service
+=== Deploy the Liquor Classifier Service
 
-The Risk Assessment Service runs as a KNative Serverless Application. We'll deploy this a little differently than we did the last one.
+The Liquor Classifier Service runs as a KNative Serverless Application. We'll deploy this a little differently than we did the last one.
 
 [source,sh,role="copypaste"]
 ----
@@ -464,7 +464,7 @@ kind: KafkaSource
 metadata:
   name: liquor-images
 spec:
-  consumerGroup: risk-assessment
+  consumerGroup: liquor-classifier
   bootstrapServers:
     - my-cluster-kafka-bootstrap:9092
   topics:
